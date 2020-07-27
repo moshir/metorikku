@@ -60,7 +60,7 @@ case class Tester(config: TesterConfig) {
             Input(Option(mock.streaming match {
               case Some(true) => new StreamMockInput(fileInput)
               case _ => fileInput
-            }), None, None, None, None, None, None)
+            }), None, None, None, None, None, None,None)
           }
         }).toMap)
       case None => None
@@ -122,7 +122,7 @@ case class Tester(config: TesterConfig) {
           if (expectedKeys.sortWith(sorter.sortStringRows).deep != actualKeys.sortWith(sorter.sortStringRows).deep) {
             val (expErrorIndexes, actErrorIndexes) = compareKeys(expectedKeys, actualKeys)
             ErrorMessage.getErrorMessageByMismatchedKeys(printableExpectedResults, printableActualResults,
-                                                          expErrorIndexes, actErrorIndexes, keyColumns, tableName)
+              expErrorIndexes, actErrorIndexes, keyColumns, tableName)
           } else {
             ErrorMessage.getErrorMessagesByMismatchedAllCols(tableKeys, printableExpectedResults, printableActualResults, job.sparkSession, tableName)
           }
@@ -228,7 +228,7 @@ case class Tester(config: TesterConfig) {
   }
 
   private def getUnmatchedKeysIndexes(expRowKeys: Array[Map[String, String]], actualRowKeys: Array[Map[String, String]],
-                                                  resType: ResultsType.Value): List[Int] = {
+                                      resType: ResultsType.Value): List[Int] = {
     val resToErrorRowIndexes =
       expRowKeys.zipWithIndex.flatMap { case (expKey, expIndex) =>
         if (!actualRowKeys.contains(expKey)) {
