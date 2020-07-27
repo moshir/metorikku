@@ -51,6 +51,17 @@
             "date_range"
           ]
         },
+        "gluetable": {
+          "type" : "object",
+          "properties": {
+            "database": {"type": "string"},
+            "tableName": {"type" :  "string"}
+          },
+          "required": [
+            "database",
+            "tableName"
+          ]
+        },
         "cassandra": {
           "type": "object",
           "properties": {
