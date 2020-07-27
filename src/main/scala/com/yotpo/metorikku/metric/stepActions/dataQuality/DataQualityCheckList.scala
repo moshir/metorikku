@@ -1,31 +1,28 @@
 package com.yotpo.metorikku.metric.stepActions.dataQuality
 
+import com.amazon.deequ.{VerificationResult, VerificationSuite}
 import com.amazon.deequ.checks.{CheckResult, CheckStatus}
 import com.amazon.deequ.metrics.DoubleMetric
-import com.amazon.deequ.{VerificationResult, VerificationSuite}
-import com.yotpo.metorikku.configuration.metric.DQCheckDefinitionList
 import org.apache.log4j.LogManager
 import org.apache.spark.sql.SparkSession
 
 import scala.util.Success
 
-case class DataQualityCheckList(dfName: String, dqCheckDefinitionList: DQCheckDefinitionList) {
-  val executingVerificationsMsg = s"Executing verification checks over dataframe $dfName"
+case class DataQualityCheckList(checks: List[DataQualityCheck],
+                                level: Option[String]) extends Serializable {
+  val executingVerificationsMsg = s"Executing verification checks over dataframe %s"
   val validationsPassedMsg = s"The data passed the validations, everything is fine!"
   val validationsFailedMsg = s"There were validation errors in the data, the following constraints were not satisfied:"
-  val validationsFailedExceptionMsg = s"Verifications failed over dataframe: $dfName"
+  val validationsFailedExceptionMsg = s"Verifications failed over dataframe: %s"
 
   val log = LogManager.getLogger(this.getClass)
-  val response = dqCheckDefinitionList.level
-  def runChecks(): Unit = {
-    val checks = dqCheckDefinitionList.checks.map {
-      dq =>
-        DataQualityCheckFactory(dq.op).getCheck(dq.column, dq.values,
-          dq.level.getOrElse(dqCheckDefinitionList.level.getOrElse("warn")))
+  def runChecks(dfName: String): Unit = {
+    val dqChecks = checks.map {
+      dq => dq.getCheck(level.getOrElse("warn"))
     }
     val df = SparkSession.builder().getOrCreate().table(dfName)
-    val verificationRunBuilder = VerificationSuite().onData(df).addChecks(checks)
-    log.info(executingVerificationsMsg)
+    val verificationRunBuilder = VerificationSuite().onData(df).addChecks(dqChecks)
+    log.info(executingVerificationsMsg.format(dfName))
     val verificationResult = verificationRunBuilder.run()
     verificationResult.status match {
       case CheckStatus.Success =>
@@ -36,7 +33,7 @@ case class DataQualityCheckList(dfName: String, dqCheckDefinitionList: DQCheckDe
     }
 
     if (verificationResult.status == CheckStatus.Error) {
-      throw DataQualityVerificationException(validationsFailedExceptionMsg)
+      throw DataQualityVerificationException(validationsFailedExceptionMsg.format(dfName))
     }
   }
 
