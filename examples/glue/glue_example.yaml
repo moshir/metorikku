@@ -1,0 +1,16 @@
+# The MQL file path
+metrics:
+  - examples/glue/glue_select.yaml
+
+inputs:
+  gluetabletest:
+    gluetable:
+      database: testemr
+      tableName: pivot
+
+
+output:
+  file:
+    dir: /examples/output
+showPreviewLines: 10
+

@@ -1,0 +1,11 @@
+steps:
+- dataFrameName: castedInputStream
+  sql:
+    SELECT * from gluetabletest
+output:
+- dataFrameName: castedInputStream
+  outputType: Parquet
+  outputOptions:
+    saveMode: Overwrite
+    path: castedInputStream.parquet
+    createUniquePath: true

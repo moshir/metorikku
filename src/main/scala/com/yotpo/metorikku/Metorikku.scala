@@ -8,7 +8,7 @@ import org.apache.log4j.LogManager
 
 object Metorikku extends App {
   val log = LogManager.getLogger(this.getClass)
-  log.info("Starting Metorikku - Parsing configuration")
+  log.info("Starting Metorikku - Parsing configuration - wts - kkd")
   val session = Job(ConfigurationParser.parse(args))
 
   session.config.periodic match {
