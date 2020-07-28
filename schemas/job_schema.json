@@ -51,11 +51,12 @@
             "date_range"
           ]
         },
-        "gluetable": {
+        "glue": {
           "type" : "object",
           "properties": {
             "database": {"type": "string"},
-            "tableName": {"type" :  "string"}
+            "tableName": {"type" :  "string"},
+            "options": { "type": "string" }
           },
           "required": [
             "database",
