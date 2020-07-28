@@ -13,8 +13,14 @@ import org.apache.spark.sql.SparkSession
 
 case class Job(val config: Configuration) {
   private val log = LogManager.getLogger(this.getClass)
+  log.info("Creating SparkSession in Job.scala")
   val sparkSession = createSparkSession(config.appName, config.output)
   val sparkContext = sparkSession.sparkContext
+  val sqlContext = sparkSession.sqlContext
+
+  log.info("!!!!!!!!!!!!!! !!!!!!!!!!!!!!!!!!!!!! SHOW DBS using sqlContext")
+  sqlContext.sql("show databases").show()
+
 
   // Set up instrumentation
   val instrumentationFactory = InstrumentationProvider.getInstrumentationFactory(
@@ -72,10 +78,19 @@ case class Job(val config: Configuration) {
   }
 
   private def createSparkSession(appName: Option[String], output: Option[Output]): SparkSession = {
+    /**
     val sparkSessionBuilder = SparkSession
       .builder()
+      .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
       .enableHiveSupport()
       .appName(appName.get)
+    **/
+    log.info("Job.createSparkSession ....")
+    val sparkSessionBuilder: SparkSession.Builder = SparkSession
+      .builder()
+      .appName("metorikku")
+      //.enableHiveSupport()
+
 
     output match {
       case Some(out) => {
@@ -91,6 +106,7 @@ case class Job(val config: Configuration) {
       case None =>
     }
 
+    sparkSessionBuilder.getOrCreate().sql("show databases").show()
 
     sparkSessionBuilder.getOrCreate()
   }
